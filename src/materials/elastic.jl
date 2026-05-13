@@ -35,3 +35,24 @@ struct LinearIsotropicElastic{dim, T <: AbstractFloat} <: AbstractElastic
 end
 
 LinearIsotropicElastic{dim}(E::T, nu::T) where {dim, T <: AbstractFloat} = LinearIsotropicElastic{dim, T}(E, nu)
+
+"""
+    compute_stress!(stress, strain, material::LinearIsotropicElastic, i)
+
+See [`AbstractMaterial`](@ref) for Voigt convention.
+"""
+function compute_stress!(
+    stress::AbstractArray{T},
+    strain::AbstractArray{T},
+    material::LinearIsotropicElastic{dim, T},
+    i::CartesianIndex
+) where {dim, T <: AbstractFloat}
+    tr_strain = sum(strain[1:dim, i])
+    mu = material.E / (2 * (1 + material.nu))
+    lambda = material.E * material.nu / ((1 + material.nu) * (1 - 2material.nu))
+
+    stress[1:dim, i] .= 2mu .* strain[1:dim, i] .+ lambda * tr_strain
+    # Engineering shear strains: gamma = 2epsilon, so shear stress = mu*gamma (no factor 2 needed)
+    stress[dim+1:end, i] .= mu .* strain[dim+1:end, i]
+    return
+end
