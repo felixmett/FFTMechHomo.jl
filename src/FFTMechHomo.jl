@@ -1,5 +1,5 @@
 module FFTMechHomo
 
-# Write your package code here.
+abstract type AbstractMaterial end
 
 end
