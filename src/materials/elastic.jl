@@ -35,6 +35,7 @@ struct LinearIsotropicElastic{dim, T <: AbstractFloat} <: AbstractElastic
 end
 
 LinearIsotropicElastic{dim}(E::T, nu::T) where {dim, T <: AbstractFloat} = LinearIsotropicElastic{dim, T}(E, nu)
+LinearIsotropicElastic{dim}(E::Real, nu::Real) where dim = LinearIsotropicElastic{dim}(promote(float(E), float(nu))...)
 
 """
     compute_stress!(stress, strain, material::LinearIsotropicElastic, i)
