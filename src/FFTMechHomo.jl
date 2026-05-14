@@ -17,6 +17,11 @@ Every material must implement:
 """
 abstract type AbstractMaterial end
 
+# structs
+export LinearIsotropicElastic
+
+include("materials/elastic.jl")
+
 end
 
 
