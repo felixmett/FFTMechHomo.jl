@@ -27,7 +27,7 @@ struct LinearIsotropicElastic{dim, T <: AbstractFloat} <: AbstractElastic
     nu::T
 
     function LinearIsotropicElastic{dim, T}(E::T, nu::T) where {dim, T <: AbstractFloat}
-        dim in (2, 3) || throw(ArgumentError("dim must be 2 or 3"))
+        dim in (2, 3) && isa(dim, Integer) || throw(ArgumentError("dim must be 2 or 3"))
         E > 0 || throw(ArgumentError("E must be positive"))
         -1 < nu < 0.5 || throw(ArgumentError("nu must be in (-1, 0.5)"))
         new{dim, T}(E, nu)
