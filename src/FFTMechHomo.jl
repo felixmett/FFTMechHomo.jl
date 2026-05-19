@@ -1,5 +1,8 @@
 module FFTMechHomo
 
+using LinearAlgebra
+using StaticArrays
+
 # structs
 export LinearIsotropicElastic
 
