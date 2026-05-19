@@ -11,6 +11,8 @@
         # explicit type
         mat32 = LinearIsotropicElastic{3, Float32}(Float32(1.0), Float32(0.3))
         @test mat32 isa LinearIsotropicElastic{3, Float32}
+        @test mat32.E isa Float32
+        @test mat32.nu isa Float32
 
         # inferred type
         mat32 = LinearIsotropicElastic{3}(Float32(1.0), Float32(0.3))
