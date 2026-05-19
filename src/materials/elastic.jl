@@ -38,6 +38,28 @@ LinearIsotropicElastic{dim}(E::T, nu::T) where {dim, T <: AbstractFloat} = Linea
 LinearIsotropicElastic{dim}(E::Real, nu::Real) where dim = LinearIsotropicElastic{dim}(promote(float(E), float(nu))...)
 
 """
+    lame_constants(mat::LinearIsotropicElastic)
+
+Return the Lamé constants `mu` and `lambda` derived from the Young's modulus and Poisson ratio of `mat`.
+
+# Returns
+- `mu`: shear modulus
+- `lambda`: first Lamé constant
+
+# Example
+```julia
+mat = LinearIsotropicElastic{3}(210e3, 0.3)
+c = lame_constants(mat)
+c.mu, c.lambda
+```
+"""
+function lame_constants(mat::LinearIsotropicElastic{dim, T}) where {dim, T <: AbstractFloat}
+    mu = mat.E / (2 * (1 + mat.nu))
+    lambda = mat.E * mat.nu / ((1 + mat.nu) * (1 - 2mat.nu))
+    return (; mu=mu, lambda=lambda)
+end
+
+"""
     compute_stress!(stress, strain, material::LinearIsotropicElastic, i)
 
 See [`AbstractMaterial`](@ref) for Voigt convention.
@@ -45,12 +67,11 @@ See [`AbstractMaterial`](@ref) for Voigt convention.
 function compute_stress!(
     stress::AbstractArray{T},
     strain::AbstractArray{T},
-    material::LinearIsotropicElastic{dim, T},
+    mat::LinearIsotropicElastic{dim, T},
     i::CartesianIndex
 ) where {dim, T <: AbstractFloat}
+    mu, lambda = lame_constants(mat)
     tr_strain = sum(strain[1:dim, i])
-    mu = material.E / (2 * (1 + material.nu))
-    lambda = material.E * material.nu / ((1 + material.nu) * (1 - 2material.nu))
 
     stress[1:dim, i] .= 2mu .* strain[1:dim, i] .+ lambda * tr_strain
     # Engineering shear strains: gamma = 2epsilon, so shear stress = mu*gamma (no factor 2 needed)
