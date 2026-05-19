@@ -1,5 +1,15 @@
 abstract type AbstractDiscreteGreenOperator end
 
+"""
+    is_first_or_nyquist(idx::CartesianIndex, disc::AbstractDiscreteGreenOperator)
+
+Return `true` if `idx` corresponds to the zero-frequency component or a
+Nyquist frequency component of the FFT grid, `false` otherwise.
+
+# Arguments
+- `idx`: grid index into the FFT output array
+- `disc`: provides the grid dimensions via `disc.dimensions`
+"""
 function is_first_or_nyquist(idx::CartesianIndex, disc::AbstractDiscreteGreenOperator)
     all(Tuple(idx) .== 1) && return true
     grid_size = disc.grid_size
