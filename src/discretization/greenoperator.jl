@@ -1,14 +1,37 @@
 abstract type AbstractDiscreteGreenOperator end
 
 """
-    is_first_or_nyquist(idx::CartesianIndex, disc::AbstractDiscreteGreenOperator)
+    Γ⁰!(field, ref::ReferenceMaterial, disc::AbstractDiscreteGreenOperator)
 
-Return `true` if `idx` corresponds to the zero-frequency component or a
-Nyquist frequency component of the FFT grid, `false` otherwise.
+Apply the Green operator `Γ⁰` in-place to a tensor field in Fourier space.
+
+For each nonzero, non-Nyquist frequency `ξ`, the field is overwritten with
+
+    field(ξ) ← -Γ⁰(ξ) : field(ξ)
+
+where `Γ⁰` is the Fourier representation of the Green operator associated with `ref` by
+`Γ⁰ = (1/α₀) Γ`. Zero and Nyquist frequencies are set to zero; the macroscopic strain must be imposed
+separately via the zero-frequency mode.
+
+See [`ReferenceMaterial`](@ref) for the assumed form of the reference material and [`AbstractMaterial`](@ref)
+for the Voigt convention used to store `field`.
 
 # Arguments
-- `idx`: grid index into the FFT output array
-- `disc`: provides the grid dimensions via `disc.dimensions`
+- `field`: complex-valued tensor field in Voigt notation, already in Fourier space, overwritten in-place
+- `ref`: reference material defining the Green operator
+- `disc`: discretization of the Green operator in Fourier space
+"""
+function Γ⁰! end
+
+"""
+    is_first_or_nyquist(idx::CartesianIndex, disc::AbstractDiscreteGreenOperator)
+
+Return `true` if `idx` corresponds to the zero-frequency component or a Nyquist frequency component
+of the FFT grid, `false` otherwise.
+
+# Arguments
+- `idx`: FFT grid index
+- `disc`: Green operator discretization, providing grid dimensions
 """
 function is_first_or_nyquist(idx::CartesianIndex, disc::AbstractDiscreteGreenOperator)
     all(Tuple(idx) .== 1) && return true
