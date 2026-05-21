@@ -25,15 +25,15 @@ mat = LinearIsotropicElastic{3, Float32}(210e3, 0.3) # explicit Float32)
 struct LinearIsotropicElastic{dim, T <: AbstractFloat} <: AbstractElastic
     E::T
     nu::T
-    mu::T
-    lambda::T
+    μ::T
+    λ::T
 
     function LinearIsotropicElastic{dim, T}(E::T, nu::T) where {dim, T <: AbstractFloat}
         dim in (2, 3) && isa(dim, Integer) || throw(ArgumentError("dim must be 2 or 3"))
         E > 0 || throw(ArgumentError("E must be positive"))
         -1 < nu < 0.5 || throw(ArgumentError("nu must be in (-1, 0.5)"))
-        mu, lambda = lame_constants(E, nu)
-        new{dim, T}(E, nu, mu, lambda)
+        μ, λ = lame_constants(E, nu)
+        new{dim, T}(E, nu, μ, λ)
     end
 end
 
@@ -41,26 +41,26 @@ LinearIsotropicElastic{dim}(E::T, nu::T) where {dim, T <: AbstractFloat} = Linea
 LinearIsotropicElastic{dim}(E::Real, nu::Real) where dim = LinearIsotropicElastic{dim}(promote(float(E), float(nu))...)
 
 Base.eltype(::LinearIsotropicElastic{dim, T}) where {dim, T <: AbstractFloat} = T
-Base.ndims(::LinearIsotropicElastic{dim, T}) where {dim, T <: AbstractFloat} = d
+Base.ndims(::LinearIsotropicElastic{dim, T}) where {dim, T <: AbstractFloat} = dim
 
 """
     lame_constants(E::AbstractFloat, nu::AbstractFloat)
 
-Return the Lamé constants `mu` and `lambda` derived from the Young's modulus `E` and Poisson ratio `nu`.
+Return the Lamé constants `μ` and `λ` derived from the Young's modulus `E` and Poisson ratio `nu`.
 
 # Returns
-- `mu`: shear modulus
-- `lambda`: first Lamé constant
+- `μ`: shear modulus
+- `λ`: first Lamé constant
 
 # Example
 ```julia
-mu, lambda = lame_constants(210e3, 0.3)
+μ, λ = lame_constants(210e3, 0.3)
 ```
 """
 function lame_constants(E::AbstractFloat, nu::AbstractFloat)
-    mu = E / (2 * (1 + nu))
-    lambda = E * nu / ((1 + nu) * (1 - 2nu))
-    return (mu, lambda)
+    μ = E / (2 * (1 + nu))
+    λ = E * nu / ((1 + nu) * (1 - 2nu))
+    return (μ, λ)
 end
 
 """
@@ -75,8 +75,8 @@ function compute_stress!(
     i::CartesianIndex
 ) where {dim, T <: AbstractFloat}
     tr_strain = sum(strain[1:dim, i])
-    stress[1:dim, i] .= 2mat.mu .* strain[1:dim, i] .+ mat.lambda * tr_strain
-    # Engineering shear strains: gamma = 2epsilon, so shear stress = mu*gamma (no factor 2 needed)
-    stress[dim+1:end, i] .= mat.mu .* strain[dim+1:end, i]
+    stress[1:dim, i] .= 2mat.μ .* strain[1:dim, i] .+ mat.λ * tr_strain
+    # Engineering shear strains: gamma = 2epsilon, so shear stress = μ*gamma (no factor 2 needed)
+    stress[dim+1:end, i] .= mat.μ .* strain[dim+1:end, i]
     return
 end
