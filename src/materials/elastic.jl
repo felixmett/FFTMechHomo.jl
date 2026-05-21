@@ -25,22 +25,28 @@ mat = LinearIsotropicElastic{3, Float32}(210e3, 0.3) # explicit Float32)
 struct LinearIsotropicElastic{dim, T <: AbstractFloat} <: AbstractElastic
     E::T
     nu::T
+    mu::T
+    lambda::T
 
     function LinearIsotropicElastic{dim, T}(E::T, nu::T) where {dim, T <: AbstractFloat}
         dim in (2, 3) && isa(dim, Integer) || throw(ArgumentError("dim must be 2 or 3"))
         E > 0 || throw(ArgumentError("E must be positive"))
         -1 < nu < 0.5 || throw(ArgumentError("nu must be in (-1, 0.5)"))
-        new{dim, T}(E, nu)
+        mu, lambda = lame_constants(E, nu)
+        new{dim, T}(E, nu, mu, lambda)
     end
 end
 
 LinearIsotropicElastic{dim}(E::T, nu::T) where {dim, T <: AbstractFloat} = LinearIsotropicElastic{dim, T}(E, nu)
 LinearIsotropicElastic{dim}(E::Real, nu::Real) where dim = LinearIsotropicElastic{dim}(promote(float(E), float(nu))...)
 
-"""
-    lame_constants(mat::LinearIsotropicElastic)
+Base.eltype(::LinearIsotropicElastic{dim, T}) where {dim, T <: AbstractFloat} = T
+Base.ndims(::LinearIsotropicElastic{dim, T}) where {dim, T <: AbstractFloat} = d
 
-Return the Lamé constants `mu` and `lambda` derived from the Young's modulus and Poisson ratio of `mat`.
+"""
+    lame_constants(E::AbstractFloat, nu::AbstractFloat)
+
+Return the Lamé constants `mu` and `lambda` derived from the Young's modulus `E` and Poisson ratio `nu`.
 
 # Returns
 - `mu`: shear modulus
@@ -48,19 +54,17 @@ Return the Lamé constants `mu` and `lambda` derived from the Young's modulus an
 
 # Example
 ```julia
-mat = LinearIsotropicElastic{3}(210e3, 0.3)
-c = lame_constants(mat)
-c.mu, c.lambda
+mu, lambda = lame_constants(210e3, 0.3)
 ```
 """
-function lame_constants(mat::LinearIsotropicElastic{dim, T}) where {dim, T <: AbstractFloat}
-    mu = mat.E / (2 * (1 + mat.nu))
-    lambda = mat.E * mat.nu / ((1 + mat.nu) * (1 - 2mat.nu))
-    return (; mu=mu, lambda=lambda)
+function lame_constants(E::AbstractFloat, nu::AbstractFloat)
+    mu = E / (2 * (1 + nu))
+    lambda = E * nu / ((1 + nu) * (1 - 2nu))
+    return (mu, lambda)
 end
 
 """
-    compute_stress!(stress, strain, material::LinearIsotropicElastic, i)
+    compute_stress!(stress::AbstractArray, strain::AbstractArray, mat::LinearIsotropicElastic, i::CartesianIndex)
 
 See [`AbstractMaterial`](@ref) for Voigt convention.
 """
@@ -70,11 +74,9 @@ function compute_stress!(
     mat::LinearIsotropicElastic{dim, T},
     i::CartesianIndex
 ) where {dim, T <: AbstractFloat}
-    mu, lambda = lame_constants(mat)
     tr_strain = sum(strain[1:dim, i])
-
-    stress[1:dim, i] .= 2mu .* strain[1:dim, i] .+ lambda * tr_strain
+    stress[1:dim, i] .= 2mat.mu .* strain[1:dim, i] .+ mat.lambda * tr_strain
     # Engineering shear strains: gamma = 2epsilon, so shear stress = mu*gamma (no factor 2 needed)
-    stress[dim+1:end, i] .= mu .* strain[dim+1:end, i]
+    stress[dim+1:end, i] .= mat.mu .* strain[dim+1:end, i]
     return
 end
