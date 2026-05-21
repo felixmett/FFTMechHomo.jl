@@ -66,6 +66,9 @@ end
 """
     compute_stress!(stress::AbstractArray, strain::AbstractArray, mat::LinearIsotropicElastic, i::CartesianIndex)
 
+Compute the stress response of a [`LinearIsotropicElastic`](@ref) material at index `i`
+using Hooke's law: σ = 2με + λ tr(ε) 𝕀.
+
 See [`AbstractMaterial`](@ref) for Voigt convention.
 """
 function compute_stress!(
