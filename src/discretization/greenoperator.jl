@@ -1,4 +1,4 @@
-abstract type AbstractDiscreteGreenOperator end
+abstract type AbstractDiscreteGreenOperator{dim, T <: AbstractFloat} end
 
 """
     Γ⁰!(field, ref::ReferenceMaterial, disc::AbstractDiscreteGreenOperator)

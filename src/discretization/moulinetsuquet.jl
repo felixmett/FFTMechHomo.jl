@@ -1,4 +1,4 @@
-struct MoulinetSuquetDiscretization{dim, T <: AbstractFloat} <: AbstractDiscreteGreenOperator
+struct MoulinetSuquetDiscretization{dim, T <: AbstractFloat} <: AbstractDiscreteGreenOperator{dim, T}
     grid_size::NTuple{dim, Int}
     ξ::NTuple{dim, Vector{T}}
 end
