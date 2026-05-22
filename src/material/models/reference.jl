@@ -52,3 +52,23 @@ function compute_stress!(
     stress[dim+1:end, i] .= 0.5mat.α₀ .* strain[dim+1:end, i]
     return
 end
+
+"""
+    subtract_stress!(stress::AbstractArray, strain::AbstractArray, mat::ReferenceMaterial)
+
+Subtract the stress response of a [`ReferenceMaterial`](@ref) from `stress` in-place at every field index.
+Unlike [`compute_stress!`](@ref), this function operates over the full field rather than at a single index.
+
+See [`AbstractMaterial`](@ref) for Voigt convention.
+"""
+function subtract_stress!(
+    stress::AbstractArray{T},
+    strain::AbstractArray{T},
+    mat::ReferenceMaterial{dim, T}
+) where {dim, T <: AbstractFloat}
+    for i in CartesianIndices(size(stress)[2:end])
+        stress[1:dim, i] .-= mat.α₀ .* strain[1:dim, i]
+        stress[dim+1:end, i] .-= 0.5mat.α₀ .* strain[dim+1:end, i]
+    end
+    return
+end
