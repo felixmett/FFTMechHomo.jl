@@ -1,4 +1,4 @@
-abstract type AbstractElastic <: AbstractMaterial end
+abstract type AbstractElastic <: HistoryIndependent end
 
 """
     LinearIsotropicElastic{dim, T}(E, nu)

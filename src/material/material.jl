@@ -14,6 +14,9 @@ Every material must implement:
 - `compute_stress!(stress, strain, material, i)`
 """
 abstract type AbstractMaterial end
+# TODO: Document that
+abstract type HistoryIndependent <: AbstractMaterial end
+abstract type HistoryDependent <: AbstractMaterial end
 
 """
     compute_stress_field!(stress, strain, ms::InternalMicrostructure)
