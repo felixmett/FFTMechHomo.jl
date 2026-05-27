@@ -17,7 +17,7 @@ end
 function solve(
     microstructure::Microstructure{dim, T},
     disc::AbstractDiscreteGreenOperator{dim, T},
-    bc::MacroscopicStrain{dim, T},
+    macro_strain::MacroscopicStrain{dim, T},
     solver::BasicScheme{Linear, T}
 ) where {dim, T}
     # reference material and internal microstructure
@@ -26,16 +26,16 @@ function solve(
     grid_constants = GridConstants(internal_microstructure)
 
     # preallocate all buffers
-    strain = initialize_strain_field(bc, microstructure)  # (n_voigt, nx, ...)
+    strain = initialize_strain_field(macro_strain, internal_microstructure)  # (n_voigt, nx, ...)
     strain_prev = similar(strain)
     polarization = similar(strain)
-    polarization_fft   = Array{Complex{T}}(undef, rfft_size(size(ε), d)) # HERE I NEED SOMETHING SELF IMPLEMENTED
+    polarization_fft   = Array{Complex{T}}(undef, rfft_output_size(disc))
 
     # stress from macroscopic strain, used in residual denominator
-    macro_stress_ref = compute_stress(bc.data, ref)
+    macro_stress_ref = compute_stress(macro_strain.data, ref)
     stress_avg = similar(macro_stress_ref)
 
-    fft_plan, ifft_plan = make_fft_plans(solver, strain, dim)
+    fft_plan, ifft_plan = make_fft_plans(solver, strain, polarization_fft, dim)
 
     res = Vector{T}(undef, solver.maxiter + 1)
     res[1] = T(Inf)
@@ -61,12 +61,12 @@ function solve(
         Γ⁰!(polarization_fft, ref, disc)
 
         # impose macroscopic strain at zero frequency
-        impose_macroscopic_strain!(polarization_fft, bc, grid_constants)
+        impose_macroscopic_strain!(polarization_fft, macro_strain, grid_constants)
 
         # inverse FFT back into ε
         mul!(strain, ifft_plan, polarization_fft)
 
-        res[k+1] = residual(polarization, strain, strain_prev, stress_avg, ref, consts)
+        res[k+1] = residual!(polarization, strain, strain_prev, stress_avg, ref, grid_constants)
     end
 
     # final stress
