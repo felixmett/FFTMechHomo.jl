@@ -46,7 +46,7 @@ specialization happens at compile time. Subsequent calls reuse the compiled code
     ms::InternalMicrostructure{dim, T, G, A}
 ) where {dim, T, G, A}
     n = fieldcount(fieldtype(ms, :groups))
-    calls = [:(apply_group!(stress, strain, ms.groups[$i], ms.materials)) for i in 1:n]
+    calls = [:(compute_group_stress!(stress, strain, ms.groups[$i], ms.materials)) for i in 1:n]
     quote $(calls...) end
 end
 
