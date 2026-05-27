@@ -1,10 +1,22 @@
 abstract type AbstractSolver end
-abstract type LinearSolver <: AbstractSolver end
-abstract type NonLinearSolver <: AbstractSolver end
 
-# fft_plan  = plan_rfft(τ, 2:d+1; flags=FFTW.MEASURE)
-# ifft_plan = plan_irfft(τ_hat, size(ε, 2), 2:d+1; flags=FFTW.MEASURE)
-# why not fft_plan! ???
+abstract type AbstractLinearity end
+abstract type Linear <: AbstractLinearity end
+abstract type NonLinear <: AbstractLinearity end
+
+struct GridConstants{dim, T <: AbstractFloat}
+    n_voigt::Int
+    n_cells::T
+    zero_idx::CartesianIndex{dim}
+end
+
+function GridConstants(microstructure::InternalMicrostructure{dim, T}) where {dim, T}
+   n_voigt = dim^2 - dim^(dim-2)
+   n_cells = T(prod(size(microstructure.materials)))
+   zero_idx = CartesianIndex(ntuple(x -> 1, dim))
+   return GridConstants{dim, T}(n_voigt, n_cells, zero_idx)
+end
+
 
 # # Somehow make this aware if linear or not
 # struct Solution{S <: AbstractSolver}
@@ -12,21 +24,4 @@ abstract type NonLinearSolver <: AbstractSolver end
 #     strain
 #     stress_avg
 #     residuals
-# end
-
-# function residual!(
-#     σ::AbstractArray{T},
-#     σ₀::AbstractArray{T},   # reuse as scratch
-#     ε::AbstractArray{T},
-#     ε_prev::AbstractArray{T},
-#     σ_bar::AbstractVector{T},
-#     ref::ReferenceMaterial
-# ) where {T}
-#     # σ₀ reused as scratch: compute stress of (ε - ε_prev) inplace
-#     @. σ₀ = ε - ε_prev
-#     compute_stress!(σ, ref, σ₀)
-#     norm_factor = T(prod(size(ε)[2:end]))
-#     nom   = sqrt((1/norm_factor) * dot(σ, σ))
-#     denom = sqrt(dot(σ_bar, σ_bar))
-#     return nom / denom
 # end
