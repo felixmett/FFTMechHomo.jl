@@ -1,8 +1,15 @@
 abstract type AbstractPrescribedStrain end
 
+dim_from_length(::Val{3}) = 2
+dim_from_length(::Val{6}) = 3
+dim_from_length(::Val{N}) where {N} = throw(ArgumentError("Vector must be of length 3 or 6, got $N"))
+
 struct MacroscopicStrain{dim, T <: AbstractFloat} <: AbstractPrescribedStrain
     data::Vector{T}
 end
+
+MacroscopicStrain{dim}(data::Vector{T}) where {dim, T <: AbstractFloat} = MacroscopicStrain{dim, T}(data)
+MacroscopicStrain(data::Vector{T}) where {T <: AbstractFloat} = MacroscopicStrain{dim_from_length(Val(length(data))), T}(data)
 
 struct MacroscopicStrainSteps{dim, T <: AbstractFloat} <: AbstractPrescribedStrain
     steps::Vector{Vector{T}}  # one strain vector per load step
