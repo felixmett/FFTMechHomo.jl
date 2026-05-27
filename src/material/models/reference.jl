@@ -46,9 +46,9 @@ function compute_stress(
     mat::ReferenceMaterial{dim, T}
 ) where {dim, T <: AbstractFloat}
     stress = similar(strain)
-    stress[1:dim, i] .= mat.α₀ .* strain[1:dim, i]
+    stress[1:dim] .= mat.α₀ .* strain[1:dim]
     # Engineering shear strains from Voigt notation: γ = 2ε, so τ = 0.5α₀γ (μ instead of 2μ)
-    stress[dim+1:end, i] .= 0.5mat.α₀ .* strain[dim+1:end, i]
+    stress[dim+1:end] .= 0.5mat.α₀ .* strain[dim+1:end]
     return stress
 end
 
