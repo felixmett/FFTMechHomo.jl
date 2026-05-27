@@ -1,8 +1,8 @@
-struct MicroStructure{dim, T <: AbstractFloat, A <: AbstractArray{<:AbstractMaterial}}
+struct Microstructure{dim, T <: AbstractFloat, A <: AbstractArray{<:AbstractMaterial}}
     materials::A       
 end
 
-function MicroStructure(materials::AbstractArray{<:AbstractMaterial})
+function Microstructure(materials::AbstractArray{<:AbstractMaterial})
     dim = ndims(first(materials))
     T = eltype(first(materials))
 
@@ -21,8 +21,8 @@ function MicroStructure(materials::AbstractArray{<:AbstractMaterial})
             but materials are of spatial dimension $(first(dims))"
         )
     )
-    MicroStructure{dim, T, typeof(materials)}(materials)
+    Microstructure{dim, T, typeof(materials)}(materials)
 end
 
-Base.ndims(::MicroStructure{dim, T, A}) where {dim, T <: AbstractFloat, A <: AbstractArray{<:AbstractMaterial}} = d
-Base.size(microstructure::MicroStructure{dim, T, A}) where {dim, T <: AbstractFloat, A <: AbstractArray{<:AbstractMaterial}} = size(microstructure.materials)
+Base.ndims(::Microstructure{dim, T, A}) where {dim, T <: AbstractFloat, A <: AbstractArray{<:AbstractMaterial}} = d
+Base.size(microstructure::Microstructure{dim, T, A}) where {dim, T <: AbstractFloat, A <: AbstractArray{<:AbstractMaterial}} = size(microstructure.materials)

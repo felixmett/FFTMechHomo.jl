@@ -3,7 +3,7 @@ struct MoulinetSuquetDiscretization{dim, T <: AbstractFloat} <: AbstractDiscrete
     ξ::NTuple{dim, Vector{T}}
 end
 
-function MoulinetSuquetDiscretization(microstructure::MicroStructure{dim, T}) where {dim, T <: AbstractFloat}
+function MoulinetSuquetDiscretization(microstructure::Microstructure{dim, T}) where {dim, T <: AbstractFloat}
     dim in (2, 3) && isa(dim, Integer) || throw(ArgumentError("dim must be 2 or 3"))
     grid_size = size(microstructure)
     ξ = ntuple(i -> i < dim ? fftfreq(grid_size[i], T(1)) : rfftfreq(grid_size[i], T(1)), dim)

@@ -7,7 +7,7 @@ struct BasicScheme{L <: AbstractLinearity, T <: AbstractFloat} <: AbstractSolver
 end
 
 function BasicScheme(
-    α₀::T, microstructure::MicroStructure{dim, T};
+    α₀::T, microstructure::Microstructure{dim, T};
     tol=1e-5, maxiter=100, FFTW_flags=FFTW.MEASURE, FFTW_num_threads=1
 ) where {dim, T <: AbstractFloat}
     L = Linear # TODO: make that inferrable from a microstructure!
@@ -15,7 +15,7 @@ function BasicScheme(
 end
 
 function solve(
-    microstructure::MicroStructure{dim, T},
+    microstructure::Microstructure{dim, T},
     disc::AbstractDiscreteGreenOperator{dim, T},
     bc::MacroscopicStrain{dim, T},
     solver::BasicScheme{Linear, T}
@@ -34,7 +34,6 @@ function solve(
     # stress from macroscopic strain, used in residual denominator
     macro_stress_ref = compute_stress(bc.data, ref)
     stress_avg = similar(macro_stress_ref)
-    res_stress = similar(macro_stress_ref)
 
     fft_plan, ifft_plan = make_fft_plans(solver, strain, dim)
 
@@ -72,7 +71,7 @@ function solve(
 
     # final stress
     compute_stress_field!(polarization, strain, internal_microstructure)
-    mean!(σ_bar, σ)
+    mean!(stress_avg, polarization)
 
-    return res[1:k+1], ε, σ, σ_bar
+    return res[2:k+1], strain, polarization, stress_avg
 end

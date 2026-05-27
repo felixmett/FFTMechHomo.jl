@@ -7,7 +7,7 @@ struct InternalMicrostructure{dim, T <: AbstractFloat, G <: Tuple, A <: Abstract
     materials::A
 end
 
-function InternalMicrostructure(ms::MicroStructure{dim, T, A}) where {dim, T <: AbstractFloat, A <: AbstractArray{<:AbstractMaterial}}
+function InternalMicrostructure(ms::Microstructure{dim, T, A}) where {dim, T <: AbstractFloat, A <: AbstractArray{<:AbstractMaterial}}
     type_map = Dict{Type, Vector{CartesianIndex{dim}}}()
     for i in CartesianIndices(ms.materials)
         mat_type = typeof(ms.materials[i])
