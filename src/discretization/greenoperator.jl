@@ -24,7 +24,7 @@ for the Voigt convention used to store `field`.
 function Γ⁰! end
 
 """
-    is_first_or_nyquist(idx::CartesianIndex, disc::AbstractDiscreteGreenOperator)
+    is_zero_or_nyquist(idx::CartesianIndex, disc::AbstractDiscreteGreenOperator)
 
 Return `true` if `idx` corresponds to the zero-frequency component or a Nyquist frequency component
 of the FFT grid, `false` otherwise.
@@ -33,7 +33,7 @@ of the FFT grid, `false` otherwise.
 - `idx`: FFT grid index
 - `disc`: Green operator discretization, providing grid dimensions
 """
-function is_first_or_nyquist(idx::CartesianIndex, disc::AbstractDiscreteGreenOperator)
+function is_zero_or_nyquist(idx::CartesianIndex, disc::AbstractDiscreteGreenOperator)
     all(Tuple(idx) .== 1) && return true
     grid_size = disc.grid_size
     for (dim_idx, i) in enumerate(Tuple(idx))
@@ -41,6 +41,18 @@ function is_first_or_nyquist(idx::CartesianIndex, disc::AbstractDiscreteGreenOpe
         n % 2 == 0 && i == n ÷ 2 && return true
     end
     return false
+end
+
+"""
+    rfft_size(disc::AbstractDiscreteGreenOperator)
+
+Return the size of the array representing the real FFT output.
+
+# Arguments
+- `disc`: Green operator discretization, providing tuple of frequeny vectors
+"""
+function rfft_output_size(disc::AbstractDiscreteGreenOperator{dim, T}) where {dim, T}
+    return (dim^2 - dim^(dim-2), ntuple(i -> length(disc.ξ[i]), length(disc.ξ))...)
 end
 
 """
