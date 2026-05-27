@@ -17,7 +17,7 @@ function GridConstants(microstructure::InternalMicrostructure{dim, T}) where {di
    return GridConstants{dim, T}(n_voigt, n_cells, zero_idx)
 end
 
-function residual(
+function residual!(
     stress::AbstractArray{T},
     strain::AbstractArray{T},
     strain_prev::AbstractArray{T},
@@ -27,8 +27,15 @@ function residual(
 ) where {dim, T}
     stress .= strain .- strain_prev
     compute_stress_field!(stress, stress, ref)
-    stress_mean = dropdims(mean(stress, dims=2:dim+1), dims=Tuple(2:dim+1))
-    return sqrt((T(1) / consts.n_cells) * tensor_dot(stress_mean, :stress) / tensor_dot(stress_avg, :stress))
+
+    inner_product_stress = T(0)
+    for i in CartesianIndices(size(stress)[2:end])
+        inner_product_stress += tensor_dot(view(stress, :, i), :stress)
+    end
+    inner_product_stress /= consts.n_cells
+    norm_stress_avg = tensor_dot(stress_avg, :stress)
+    
+    return sqrt(inner_product_stress / norm_stress_avg)
 end
 
 # # Somehow make this aware if linear or not
