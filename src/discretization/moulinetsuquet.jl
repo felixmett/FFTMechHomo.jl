@@ -6,7 +6,7 @@ end
 function MoulinetSuquetDiscretization(microstructure::Microstructure{dim, T}) where {dim, T <: AbstractFloat}
     dim in (2, 3) && isa(dim, Integer) || throw(ArgumentError("dim must be 2 or 3"))
     grid_size = size(microstructure)
-    ξ = ntuple(i -> i < dim ? fftfreq(grid_size[i], T(1)) : rfftfreq(grid_size[i], T(1)), dim)
+    ξ = ntuple(i -> i > 1 ? fftfreq(grid_size[i], T(1)) : rfftfreq(grid_size[i], T(1)), dim)
     MoulinetSuquetDiscretization{dim, T}(grid_size, ξ)
 end
 
@@ -28,7 +28,7 @@ function Γ⁰!(
 
     fft_grid_size = ntuple(i -> length(disc.ξ[i]), dim)
     for idx in CartesianIndices(fft_grid_size)
-        if is_zero_or_nyquist(disc, idx)
+        if is_zero_or_nyquist(idx, disc)
             field[:, idx] .= zero(Complex{T})
             continue
         end
@@ -37,7 +37,7 @@ function Γ⁰!(
         eta = normalize(k)
         
         for i in 1:dim, j in 1:dim
-            field_tensor[i,j] = field[voigt_idx[i,j], idx]
+            field_tensor[i,j] = field[voigt_idx[i][j], idx]
         end
         
         f = field_tensor * eta
@@ -46,7 +46,7 @@ function Γ⁰!(
 
         field[:, idx] .= zero(Complex{T})
         for i in 1:dim, j in 1:dim
-            field[voigt_idx[i,j], idx] += u[i] * eta[j]
+            field[voigt_idx[i][j], idx] += u[i] * eta[j]
         end
     end
 end
