@@ -7,11 +7,11 @@ struct BasicScheme{L <: AbstractLinearity, T <: AbstractFloat} <: AbstractSolver
 end
 
 function BasicScheme(
-    α₀::T, microstructure::Microstructure{dim, T};
+    α₀::Real, microstructure::Microstructure{dim, T};
     tol=1e-5, maxiter=100, FFTW_flags=FFTW.MEASURE, FFTW_num_threads=1
 ) where {dim, T <: AbstractFloat}
     L = Linear # TODO: make that inferrable from a microstructure!
-    return BasicScheme{L, T}(α₀, T(tol), maxiter, FFTW_flags, FFTW_num_threads)
+    return BasicScheme{L, T}(T(α₀), T(tol), maxiter, FFTW_flags, FFTW_num_threads)
 end
 
 function solve(
