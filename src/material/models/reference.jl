@@ -34,10 +34,47 @@ ReferenceMaterial{dim}(α₀::T) where {dim, T <: AbstractFloat} = ReferenceMate
 ReferenceMaterial{dim}(α₀::Real) where dim = ReferenceMaterial{dim}(float(α₀))
 
 """
+    compute_stress(strain::AbstractVector, mat::ReferenceMaterial)
+
+Compute the stress response of a [`ReferenceMaterial`](@ref) with respect to a strain Vector.
+Returns the stress response in a new Vector.
+
+See [`AbstractMaterial`](@ref) for Voigt convention.
+"""
+function compute_stress(
+    strain::AbstractVector{T},
+    mat::ReferenceMaterial{dim, T}
+) where {dim, T <: AbstractFloat}
+    stress = similar(strain)
+    stress[1:dim, i] .= mat.α₀ .* strain[1:dim, i]
+    # Engineering shear strains from Voigt notation: γ = 2ε, so τ = 0.5α₀γ (μ instead of 2μ)
+    stress[dim+1:end, i] .= 0.5mat.α₀ .* strain[dim+1:end, i]
+    return stress
+end
+
+"""
+    compute_stress!(stress::AbstractVector, strain::AbstractVector, mat::ReferenceMaterial)
+
+Compute the stress response of a [`ReferenceMaterial`](@ref) with respect to a strain Vector.
+Stress response is stored in-place in `stress`.
+
+See [`AbstractMaterial`](@ref) for Voigt convention.
+"""
+function compute_stress!(
+    stress::AbstractVector{T},
+    strain::AbstractVector{T},
+    mat::ReferenceMaterial{dim, T}
+) where {dim, T <: AbstractFloat}
+    stress[1:dim, i] .= mat.α₀ .* strain[1:dim, i]
+    # Engineering shear strains from Voigt notation: γ = 2ε, so τ = 0.5α₀γ (μ instead of 2μ)
+    stress[dim+1:end, i] .= 0.5mat.α₀ .* strain[dim+1:end, i]
+end
+
+"""
     compute_stress!(stress::AbstractArray, strain::AbstractArray, mat::ReferenceMaterial, i::CartesianIndex)
 
-Compute the stress response of a [`ReferenceMaterial`](@ref), which corresponds
-to a [`LinearIsotropicElastic`](@ref) material with μ=0.5α₀ and λ=0.
+Compute the stress response of a [`ReferenceMaterial`](@ref) with respect to a strain at a given `CartesianIndex`.
+The result is stored in-place at the same index in `stress`.
 
 See [`AbstractMaterial`](@ref) for Voigt convention.
 """
@@ -69,6 +106,22 @@ function subtract_stress!(
     for i in CartesianIndices(size(stress)[2:end])
         stress[1:dim, i] .-= mat.α₀ .* strain[1:dim, i]
         stress[dim+1:end, i] .-= 0.5mat.α₀ .* strain[dim+1:end, i]
+    end
+    return
+end
+
+"""
+    compute_stress_field!(stress, strain, mat::ReferenceMaterial)
+
+Compute the entire stress field resulting from the reference material `mat` and `strain` at every grid point in-place.
+"""
+function compute_stress_field!(
+    stress::AbstractArray{T},
+    strain::AbstractArray{T},
+    mat::ReferenceMaterial{dim, T}
+) where {dim, T}
+    for i in CartesianIndices(size(strain)[2:end])
+        compute_stress!(stress, strain, mat, i)
     end
     return
 end
