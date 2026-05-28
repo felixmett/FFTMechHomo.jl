@@ -3,6 +3,15 @@ struct MoulinetSuquetDiscretization{dim, T <: AbstractFloat} <: AbstractDiscrete
     ξ::NTuple{dim, Vector{T}}
 end
 
+"""
+    MoulinetSuquetDiscretization(microstructure)
+
+Construct the Moulinec-Suquet spectral discretization of the reference Green
+operator from `microstructure`.
+
+Computes the FFT frequency vectors for each spatial dimension, using `rfftfreq`
+for the first spatial dimension to exploit the symmetry of the real-to-complex FFT.
+"""
 function MoulinetSuquetDiscretization(microstructure::Microstructure{dim, T}) where {dim, T <: AbstractFloat}
     dim in (2, 3) && isa(dim, Integer) || throw(ArgumentError("dim must be 2 or 3"))
     grid_size = size(microstructure)
@@ -16,7 +25,8 @@ Base.eltype(::MoulinetSuquetDiscretization{dim, T}) where {dim, T <: AbstractFlo
 """
     Γ⁰!(field, ref, disc::MoulinetSuquetDiscretization)
 
-Moulinec-Suquet discretization of the Green operator.
+Apply the Green operator `Γ⁰` in-place using the Moulinec-Suquet discretization.
+See [`Γ⁰!`](@ref) for the general interface.
 """
 function Γ⁰!(
     field::AbstractArray{Complex{T}}, 
