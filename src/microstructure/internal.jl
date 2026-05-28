@@ -1,12 +1,36 @@
+"""
+    MaterialGroup{dim, M}
+
+Internal struct.
+Groups indices by concrete material type to enable compile-time dispatch in compute_stress_field!.
+"""
 struct MaterialGroup{dim, M <: AbstractMaterial}
     indices::Vector{CartesianIndex{dim}}
 end
 
+"""
+    InternalMicrostructure{dim, T, G, A}
+
+Internal preprocessed representation of a [`Microstructure`](@ref).
+
+Materials are grouped by concrete type into a `Tuple` of [`MaterialGroup`](@ref)s.
+This allows `compute_stress_field!` to resolve `compute_stress!` dispatch once
+per material type rather than once per voxel via `@generated` code emission.
+"""
 struct InternalMicrostructure{dim, T <: AbstractFloat, G <: Tuple, A <: AbstractArray{<: AbstractMaterial}}
     groups::G
     materials::A
 end
 
+"""
+    InternalMicrostructure(ms::Microstructure)
+
+Preprocess `ms` into an [`InternalMicrostructure`](@ref) by grouping voxel
+indices by concrete material type.
+
+This is called automatically by [`solve`](@ref) and does not need to be called
+manually.
+"""
 function InternalMicrostructure(ms::Microstructure{dim, T, A}) where {dim, T <: AbstractFloat, A <: AbstractArray{<:AbstractMaterial}}
     type_map = Dict{Type, Vector{CartesianIndex{dim}}}()
     for i in CartesianIndices(ms.materials)
@@ -21,6 +45,9 @@ function InternalMicrostructure(ms::Microstructure{dim, T, A}) where {dim, T <: 
 
     InternalMicrostructure{dim, T, typeof(groups), typeof(ms.materials)}(groups, ms.materials)
 end
+
+Base.ndims(::InternalMicrostructure{dim}) where {dim} = dim
+Base.size(microstructure::InternalMicrostructure) = size(microstructure.materials)
 
 """
     compute_stress_field!(stress, strain, ms::InternalMicrostructure)
@@ -77,7 +104,7 @@ end
 Compute the polarization field `τ = σ(ε) - σ₀(ε)` in-place, storing the result in `stress`.
 
 On return, `stress` holds the polarization field rather than the physical stress.
-Combines [`compute_stress_field!`](@ref) with [`subtract_stress!`](@ref) without requiring an additional buffer.
+Combines [`compute_stress_field!`](@ref) with [`subtract_from_stress_field!`](@ref) without requiring an additional buffer.
 """
 function compute_polarization_field!(
     stress::AbstractArray{T},
@@ -86,6 +113,6 @@ function compute_polarization_field!(
     ref::ReferenceMaterial{dim, T}
 ) where {dim, T}
     compute_stress_field!(stress, strain, ms)
-    subtract_stress!(stress, strain, ref)
+    subtract_from_stress_field!(stress, strain, ref)
     return
 end
