@@ -6,8 +6,6 @@ abstract type AbstractElastic <: HistoryIndependent end
 
 Linear isotropic elastic material (Hooke's law).
 
-See [`AbstractMaterial`](@ref) for Voigt convention.
-
 # Type Parameters
 - `dim`: spatial dimension (2 or 3)
 - `T`: numeric type, must be `<: AbstractFloat`
@@ -68,8 +66,6 @@ end
 
 Compute the stress response of a [`LinearIsotropicElastic`](@ref) material at index `i`
 using Hooke's law: σ = 2με + λ tr(ε) 𝕀.
-
-See [`AbstractMaterial`](@ref) for Voigt convention.
 """
 function compute_stress!(
     stress::AbstractArray{T},
