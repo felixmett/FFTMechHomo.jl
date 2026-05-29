@@ -21,15 +21,16 @@ include("discretization/greenoperator.jl")
 include("material/models/elastic.jl")
 include("material/models/reference.jl")
 include("microstructure/internal.jl")
+include("solver/macroscopicstrain.jl")
+include("utilities/tensors.jl")
 include("solver/solver.jl")
+include("utilities/fft.jl")
 
 include("discretization/moulinetsuquet.jl")
 
-include("solver/macroscopicstrain.jl")
 include("solver/basic.jl")
 
-include("utilities/fft.jl")
-include("utilities/tensors.jl")
+
 
 end
 
