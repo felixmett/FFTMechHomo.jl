@@ -1,3 +1,9 @@
+"""
+    make_fft_plans(solver, field, field_fft, dim)
+
+Create a forward `rfft` and inverse `irfft` plan for the spatial dimensions
+`2:dim+1` of `field`, using the FFTW settings from `solver`.
+"""
 function make_fft_plans(
     solver::AbstractSolver,
     field::AbstractArray{T},
@@ -8,13 +14,4 @@ function make_fft_plans(
     fft_plan  = plan_rfft(field, 2:dim+1; flags=solver.FFTW_flags)
     ifft_plan = plan_irfft(field_fft, size(field, 2), 2:dim+1; flags=solver.FFTW_flags)
     return fft_plan, ifft_plan
-end
-
-function cell_average!(
-    cell_avg::Vector{T}, 
-    field_fft::AbstractArray{Complex{T}}, 
-    consts::GridConstants{dim, T}
-) where {dim, T}
-    cell_avg .= real(field_fft[1:consts.n_voigt, consts.zero_idx]) ./ consts.n_cells
-    return
 end
