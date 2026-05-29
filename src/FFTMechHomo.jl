@@ -23,6 +23,7 @@ include("material/models/reference.jl")
 include("microstructure/internal.jl")
 include("solver/macroscopicstrain.jl")
 include("utilities/tensors.jl")
+include("solver/solution.jl")
 include("solver/solver.jl")
 include("utilities/fft.jl")
 
