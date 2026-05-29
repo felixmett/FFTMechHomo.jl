@@ -73,5 +73,5 @@ function solve(
     compute_stress_field!(polarization, strain, internal_microstructure)
     mean!(stress_avg, polarization)
 
-    return res[2:k+1], strain, polarization, stress_avg
+    return Solution{T}(strain, stress, stress_avg, res[2:k+1], k < solver.maxiter, k)
 end
