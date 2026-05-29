@@ -1,5 +1,5 @@
 struct Microstructure{dim, T <: AbstractFloat, A <: AbstractArray{<:AbstractMaterial}}
-    materials::A       
+    materials::A
 end
 
 """
@@ -34,7 +34,7 @@ function Microstructure(materials::AbstractArray{<:AbstractMaterial})
 
     length(size(materials)) == dim || throw(
         ArgumentError(
-            "microstructure has $(ndims(materials)) spatial dimensions, 
+            "microstructure has $(ndims(materials)) spatial dimensions,
             but materials are of spatial dimension $(first(dims))"
         )
     )

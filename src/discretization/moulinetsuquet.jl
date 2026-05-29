@@ -29,8 +29,8 @@ Apply the Green operator `Γ⁰` in-place using the Moulinec-Suquet discretizati
 See [`Γ⁰!`](@ref) for the general interface.
 """
 function Γ⁰!(
-    field::AbstractArray{Complex{T}}, 
-    ref::ReferenceMaterial{dim,T}, 
+    field::AbstractArray{Complex{T}},
+    ref::ReferenceMaterial{dim,T},
     disc::MoulinetSuquetDiscretization{dim,T}
 ) where {dim, T <: AbstractFloat}
     field_tensor = MMatrix{dim, dim, Complex{T}}(undef)
@@ -45,11 +45,11 @@ function Γ⁰!(
 
         k = SVector(ntuple(i -> disc.ξ[i][idx[i]], dim))
         eta = normalize(k)
-        
+
         for i in 1:dim, j in 1:dim
             field_tensor[i,j] = field[voigt_idx[i][j], idx]
         end
-        
+
         f = field_tensor * eta
         s = dot(f, eta)
         u = (1 / 0.5ref.α₀) * (-f + T(0.5) * s * eta)
