@@ -1,41 +1,24 @@
 @testset "ReferenceMaterial" begin
     @testset "Constructor" begin
-        @testset "2D" begin
-            mat = FFTMechHomo.ReferenceMaterial{2}(1.0)
-            @test mat.α₀ ≈ 1.0
-            @test mat isa FFTMechHomo.ReferenceMaterial{2, Float64}
+        for dim in (2,3)
+            @testset "$(dim)D" begin
+                mat = FFTMechHomo.ReferenceMaterial{dim}(1.0)
+                @test mat.α₀ ≈ 1.0
+                @test mat isa FFTMechHomo.ReferenceMaterial{dim, Float64}
 
-            # explicit type
-            mat = FFTMechHomo.ReferenceMaterial{2, Float32}(Float32(1.0))
-            @test mat isa FFTMechHomo.ReferenceMaterial{2, Float32}
-            @test mat.α₀ isa Float32
+                # explicit type
+                mat = FFTMechHomo.ReferenceMaterial{dim, Float32}(Float32(1.0))
+                @test mat isa FFTMechHomo.ReferenceMaterial{dim, Float32}
+                @test mat.α₀ isa Float32
 
-            # inferred type
-            mat = FFTMechHomo.ReferenceMaterial{2}(Float32(1.0))
-            @test mat isa FFTMechHomo.ReferenceMaterial{2, Float32}
+                # inferred type
+                mat = FFTMechHomo.ReferenceMaterial{dim}(Float32(1.0))
+                @test mat isa FFTMechHomo.ReferenceMaterial{dim, Float32}
 
-            # from Int
-            mat = FFTMechHomo.ReferenceMaterial{2}(1) # Int
-            @test mat isa FFTMechHomo.ReferenceMaterial{2, Float64}
-        end
-
-        @testset "3D" begin
-            mat = FFTMechHomo.ReferenceMaterial{3}(1.0)
-            @test mat.α₀ ≈ 1.0
-            @test mat isa FFTMechHomo.ReferenceMaterial{3, Float64}
-
-            # explicit type
-            mat = FFTMechHomo.ReferenceMaterial{3, Float32}(Float32(1.0))
-            @test mat isa FFTMechHomo.ReferenceMaterial{3, Float32}
-            @test mat.α₀ isa Float32
-
-            # inferred type
-            mat = FFTMechHomo.ReferenceMaterial{3}(Float32(1.0))
-            @test mat isa FFTMechHomo.ReferenceMaterial{3, Float32}
-
-            # from Int
-            mat = FFTMechHomo.ReferenceMaterial{3}(1) # Int
-            @test mat isa FFTMechHomo.ReferenceMaterial{3, Float64}
+                # from Int
+                mat = FFTMechHomo.ReferenceMaterial{dim}(1) # Int
+                @test mat isa FFTMechHomo.ReferenceMaterial{dim, Float64}
+            end
         end
         
         # invalid parameters
