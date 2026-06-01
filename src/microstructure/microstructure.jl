@@ -35,7 +35,7 @@ function Microstructure(materials::AbstractArray{<:AbstractMaterial})
     length(size(materials)) == dim || throw(
         ArgumentError(
             "microstructure has $(ndims(materials)) spatial dimensions,
-            but materials are of spatial dimension $(first(dims))"
+            but materials are of spatial dimension $dim"
         )
     )
     Microstructure{dim, T, typeof(materials)}(materials)
