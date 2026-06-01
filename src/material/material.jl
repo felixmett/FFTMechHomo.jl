@@ -6,8 +6,8 @@ Abstract supertype for all material models.
 # Voigt Convention
 All materials use engineering shear strains (γ = 2ε):
 
-    strain = [ε₁₁, ε₂₂, (ε₃₃,) γ₁₂, (γ₁₃, γ₂₃)]
-    stress = [σ₁₁, σ₂₂, (σ₃₃,) σ₁₂, (σ₁₃, σ₂₃)]
+    strain = [ε₁₁, ε₂₂, (ε₃₃, γ₂₃, γ₁₃,) γ₁₂]
+    stress = [σ₁₁, σ₂₂, (σ₃₃, σ₂₃, σ₁₃,) σ₁₂]
 
 Subtypes are categorized by memory behaviour:
 - [`HistoryIndependent`](@ref): stress depends only on current strain
