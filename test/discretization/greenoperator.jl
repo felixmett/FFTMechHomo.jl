@@ -1,6 +1,7 @@
 function test_discretizations(n::Int, dim::Int)
     implemented_discs = [
-        MoulinetSuquetDiscretization(Microstructure(fill(LinearIsotropicElastic{dim}(1.0, 0.3), ntuple(x -> n, dim)...)))
+        disc(Microstructure(fill(LinearIsotropicElastic{dim}(1.0, 0.3), ntuple(x -> n, dim)...)))
+        for disc in subtypes(FFTMechHomo.AbstractDiscreteGreenOperator)
     ]
     return implemented_discs
 end
@@ -76,29 +77,29 @@ end
     @testset "rfft_output_size" begin
         @testset "2D" begin
             for n in (7, 8)
-                disc = MoulinetSuquetDiscretization(Microstructure(fill(LinearIsotropicElastic{2}(1.0, 0.3), n, n)))
+                for disc in test_discretizations(n, 2)
+                    # first dimension is n_voigt
+                    @test FFTMechHomo.rfft_output_size(disc)[1] == 3
 
-                # first dimension is n_voigt
-                @test FFTMechHomo.rfft_output_size(disc)[1] == 3
-
-                # first spatial dimension is halved due to rfft
-                expected_size = (3, n ÷ 2 + 1, n)
-                rfft_output_size = FFTMechHomo.rfft_output_size(disc)
-                @test rfft_output_size == rfft_output_size
+                    # first spatial dimension is halved due to rfft
+                    expected_size = (3, n ÷ 2 + 1, n)
+                    rfft_output_size = FFTMechHomo.rfft_output_size(disc)
+                    @test rfft_output_size == rfft_output_size
+                end
             end
         end
 
         @testset "3D" begin
             for n in (7, 8)
-                disc = MoulinetSuquetDiscretization(Microstructure(fill(LinearIsotropicElastic{3}(1.0, 0.3), n, n, n)))
+                for disc in test_discretizations(n, 3)
+                    # first dimension is n_voigt
+                    @test FFTMechHomo.rfft_output_size(disc)[1] == 6
 
-                # first dimension is n_voigt
-                @test FFTMechHomo.rfft_output_size(disc)[1] == 6
-
-                # first spatial dimension is halved due to rfft
-                expected_size = (6, n ÷ 2 + 1, n, n)
-                rfft_output_size = FFTMechHomo.rfft_output_size(disc)
-                @test rfft_output_size == rfft_output_size
+                    # first spatial dimension is halved due to rfft
+                    expected_size = (6, n ÷ 2 + 1, n, n)
+                    rfft_output_size = FFTMechHomo.rfft_output_size(disc)
+                    @test rfft_output_size == rfft_output_size
+                end
             end
         end
     end
