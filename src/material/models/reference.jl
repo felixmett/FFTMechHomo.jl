@@ -18,7 +18,7 @@ i.e. Lamé parameters μ=0.5α₀ and λ=0.
 ref = ReferenceMaterial{3}(1.0)
 ```
 """
-struct ReferenceMaterial{dim, T <: AbstractFloat} <: AbstractElastic
+struct ReferenceMaterial{dim, T} <: AbstractElastic{dim, T}
     α₀::T
 
     function ReferenceMaterial{dim, T}(α₀::T) where {dim, T <: AbstractFloat}

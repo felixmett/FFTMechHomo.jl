@@ -13,7 +13,10 @@ Subtypes are categorized by memory behaviour:
 - [`HistoryIndependent`](@ref): stress depends only on current strain
 - [`HistoryDependent`](@ref): stress depends on strain history and internal variables
 """
-abstract type AbstractMaterial end
+abstract type AbstractMaterial{dim, T <: AbstractFloat} end
+
+Base.eltype(::AbstractMaterial{dim, T}) where {dim, T} = T
+Base.ndims(::AbstractMaterial{dim, T}) where {dim, T} = dim
 
 """
     HistoryIndependent <: AbstractMaterial
@@ -21,7 +24,7 @@ abstract type AbstractMaterial end
 Abstract supertype for materials whose stress response depends only on the
 current strain, with no internal variables. Example: linear elasticity
 """
-abstract type HistoryIndependent <: AbstractMaterial end
+abstract type HistoryIndependent{dim, T <: AbstractFloat} <: AbstractMaterial{dim, T} end
 
 """
     HistoryDependent <: AbstractMaterial
@@ -29,7 +32,7 @@ abstract type HistoryIndependent <: AbstractMaterial end
 Abstract supertype for materials with internal variables that evolve over the
 deformation history. Examples: plasticity, damage, viscoelasticity.
 """
-abstract type HistoryDependent <: AbstractMaterial end
+abstract type HistoryDependent{dim, T <: AbstractFloat} <: AbstractMaterial{dim, T} end
 
 """
     compute_stress!(stress, strain, material::AbstractMaterial, i::CartesianIndex)

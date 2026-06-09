@@ -1,4 +1,4 @@
-abstract type AbstractElastic <: HistoryIndependent end
+abstract type AbstractElastic{dim, T <: AbstractFloat} <: HistoryIndependent{dim, T} end
 
 """
     LinearIsotropicElastic{dim, T}(E, nu)
@@ -20,7 +20,7 @@ mat = LinearIsotropicElastic{3}(210e3, 0.3) # Float64 by default
 mat = LinearIsotropicElastic{3, Float32}(210e3, 0.3) # explicit Float32)
 ```
 """
-struct LinearIsotropicElastic{dim, T <: AbstractFloat} <: AbstractElastic
+struct LinearIsotropicElastic{dim, T} <: AbstractElastic{dim, T}
     E::T
     nu::T
     μ::T
@@ -37,9 +37,6 @@ end
 
 LinearIsotropicElastic{dim}(E::T, nu::T) where {dim, T <: AbstractFloat} = LinearIsotropicElastic{dim, T}(E, nu)
 LinearIsotropicElastic{dim}(E::Real, nu::Real) where dim = LinearIsotropicElastic{dim}(promote(float(E), float(nu))...)
-
-Base.eltype(::LinearIsotropicElastic{dim, T}) where {dim, T <: AbstractFloat} = T
-Base.ndims(::LinearIsotropicElastic{dim, T}) where {dim, T <: AbstractFloat} = dim
 
 """
     lame_constants(E::AbstractFloat, nu::AbstractFloat)

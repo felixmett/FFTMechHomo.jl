@@ -41,5 +41,15 @@ function Microstructure(materials::AbstractArray{<:AbstractMaterial})
     Microstructure{dim, T, typeof(materials)}(materials)
 end
 
+function Microstructure(materials::AbstractArray{<:AbstractMaterial{dim, T}}) where {dim, T}
+    length(size(materials)) == dim || throw(
+        ArgumentError(
+            "microstructure has $(ndims(materials)) spatial dimensions,
+            but materials are of spatial dimension $dim"
+        )
+    )
+    Microstructure{dim, T, typeof(materials)}(materials)
+end
+
 Base.ndims(::Microstructure{dim, T, A}) where {dim, T <: AbstractFloat, A <: AbstractArray{<:AbstractMaterial}} = dim
 Base.size(microstructure::Microstructure{dim, T, A}) where {dim, T <: AbstractFloat, A <: AbstractArray{<:AbstractMaterial}} = size(microstructure.materials)
