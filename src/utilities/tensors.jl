@@ -12,7 +12,7 @@ voigt_weights(::Val{3}, ::Type{T}, ::Val{:stress}) where {T} = Diagonal(T[1, 1, 
 voigt_weights(::Val{6}, ::Type{T}, ::Val{:stress}) where {T} = Diagonal(T[1, 1, 1, 2, 2, 2])
 voigt_weights(::Val{3}, ::Type{T}, ::Val{:mixed}) where {T} = Diagonal(T[1, 1, 1])
 voigt_weights(::Val{6}, ::Type{T}, ::Val{:mixed}) where {T} = Diagonal(T[1, 1, 1, 1, 1, 1])
-voigt_weights(::Val{N}, ::Type{T}, ::Val{S}) where {N, T, S <: Symbol} = throw(ArgumentError("Vectors must be of length 3 or 6, got $N"))
+voigt_weights(::Val{N}, ::Type{T}, ::Val{S}) where {N, T, S} = throw(ArgumentError("Vectors must be of length 3 or 6, got $N"))
 
 """
     tensor_dot(u, v, kind)
