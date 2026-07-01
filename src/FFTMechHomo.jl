@@ -5,6 +5,9 @@ using LinearAlgebra
 using StaticArrays
 using Statistics
 
+# types
+export HistoryIndependent
+
 # structs
 export MoulinetSuquetDiscretization
 export LinearIsotropicElastic
@@ -14,6 +17,7 @@ export MacroscopicStrain
 
 # functions
 export solve
+export compute_stress!
 
 include("material/material.jl")
 include("microstructure/microstructure.jl")
