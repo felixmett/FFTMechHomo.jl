@@ -64,6 +64,8 @@ function solve(
     stress_avg = similar(macro_stress_ref)
 
     fft_plan, ifft_plan = make_fft_plans(solver, strain, polarization_fft, dim)
+    # make sure to not use intermediate garbage from FFT plan creation
+    strain .= initialize_strain_field(macro_strain, internal_microstructure)
 
     res = Vector{T}(undef, solver.maxiter + 1)
     res[1] = T(Inf)
