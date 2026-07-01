@@ -34,7 +34,7 @@ end
 #===
 For internal consistency checks, we need to specify a dimension `dim` and a data type `T` of the parameters.
 
-To integrate the new material into `FFTMechHomo.jl`, we implement the required stress update function. 
+To integrate the new material into `FFTMechHomo.jl`, we implement the required stress update function. Due to the internal use of Voigt-notation, the factor ``2`` for shear stresses is already adsorbed in the shear strains, therefore we only need ``\mu`` for these components.
 
 This function specifies how the material computes stress from a given strain and is called by the solver for each point in the microstructure.
 ===#
@@ -47,7 +47,6 @@ function FFTMechHomo.compute_stress!(
 ) where {dim, T <: AbstractFloat}
     tr_strain = sum(strain[1:dim, i])
     stress[1:dim, i] .= 2mat.μ .* strain[1:dim, i] .+ mat.λ * tr_strain
-    # Engineering shear strains: gamma = 2epsilon, so shear stress = μ*gamma (no factor 2 needed)
     stress[dim+1:end, i] .= mat.μ .* strain[dim+1:end, i]
     return
 end
