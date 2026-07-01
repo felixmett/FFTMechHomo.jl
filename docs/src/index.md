@@ -2,13 +2,6 @@
 CurrentModule = FFTMechHomo
 ```
 
-# FFTMechHomo
+# FFTMechHomo.jl
 
-Documentation for [FFTMechHomo](https://github.com/Cr0gan/FFTMechHomo.jl).
-
-```@index
-```
-
-```@autodocs
-Modules = [FFTMechHomo]
-```
+Documentation for [FFTMechHomo.jl](https://github.com/felixmett/FFTMechHomo.jl).
