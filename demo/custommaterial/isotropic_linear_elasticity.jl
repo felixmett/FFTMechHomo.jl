@@ -41,8 +41,8 @@ mat_hard_builtin = LinearIsotropicElastic{dim, Float64}(72000., 0.22)
 validation_microstructure = simple_microstructure(mat_soft_builtin, mat_hard_builtin)
 
 disc = MoulinetSuquetDiscretization(validation_microstructure)
-solver = BasicScheme(mat_soft_builtin.μ + mat_hard_builtin.μ, microstructure)
-validation_sol = solve(microstructure, disc, macro_strain, solver)
+solver = BasicScheme(mat_soft_builtin.μ + mat_hard_builtin.μ, validation_microstructure)
+validation_sol = solve(validation_microstructure, disc, macro_strain, solver)
 
 @assert sol.stress_avg ≈ validation_sol.stress_avg
 
