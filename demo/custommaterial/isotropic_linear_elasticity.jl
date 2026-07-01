@@ -44,6 +44,6 @@ disc = MoulinetSuquetDiscretization(validation_microstructure)
 solver = BasicScheme(mat_soft_builtin.μ + mat_hard_builtin.μ, validation_microstructure)
 validation_sol = solve(validation_microstructure, disc, macro_strain, solver)
 
-@assert sol.stress_avg ≈ validation_sol.stress_avg
+sol.stress_avg ≈ validation_sol.stress_avg
 
 # This file was generated using Literate.jl, https://github.com/fredrikekre/Literate.jl

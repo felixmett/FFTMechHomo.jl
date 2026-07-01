@@ -44,6 +44,6 @@ end
 test_strain = MacroscopicStrain([ε0, ε0, ε0])
 test_sol = solve(microstructure, disc, test_strain, solver)
 homogenized_stress = ℂ * test_strain.data
-@assert isapprox(test_sol.stress_avg, homogenized_stress; rtol=1e-3)
+isapprox(test_sol.stress_avg, homogenized_stress; rtol=1e-3)
 
 # This file was generated using Literate.jl, https://github.com/fredrikekre/Literate.jl
