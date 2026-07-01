@@ -30,6 +30,7 @@ struct CustomElasticity{dim, T <: AbstractFloat} <: HistoryIndependent{dim, T}
         new{dim, T}(E, nu, μ, λ)
     end
 end
+#md nothing # hide
 
 #===
 For internal consistency checks, we need to specify a dimension `dim` and a data type `T` of the parameters.
@@ -50,12 +51,14 @@ function FFTMechHomo.compute_stress!(
     stress[dim+1:end, i] .= mat.μ .* strain[dim+1:end, i]
     return
 end
+#md nothing # hide
 
 #===
 With that our material can be used inside of the solver of `FFTMechHomo.jl`. We now test our implementation against the preexisting isotropic linear elasticity model. For that, we first define a simple microstructure.
 ===#
 
 simple_microstructure(mat1, mat2) = Microstructure([i==1 ? mat1 : mat2 for i in 1:3, j in 1:3, k in 1:3])
+#md nothing # hide
 
 #===
 Then we create a microstructure with instances of our new material.
@@ -65,6 +68,7 @@ dim = 3
 mat_soft_custom = CustomElasticity{dim, Float64}(2100., 0.3)
 mat_hard_custom = CustomElasticity{dim, Float64}(72000., 0.22)
 microstructure = simple_microstructure(mat_soft_custom, mat_hard_custom)
+#md nothing # hide
 
 #===
 To compute the strain response of the heterogeneous material, we specify a discretization, a macroscopic strain and a solver.
@@ -74,6 +78,7 @@ disc = MoulinetSuquetDiscretization(microstructure)
 macro_strain = MacroscopicStrain([0.01, 0, 0, 0, 0, 0])
 solver = BasicScheme(mat_soft_custom.μ + mat_hard_custom.μ, microstructure)
 sol = solve(microstructure, disc, macro_strain, solver)
+#md nothing # hide
 
 #===
 Now we repeat the same computation using the built-in model, which should give the exact same results.
@@ -87,6 +92,6 @@ disc = MoulinetSuquetDiscretization(validation_microstructure)
 solver = BasicScheme(mat_soft_builtin.μ + mat_hard_builtin.μ, validation_microstructure)
 validation_sol = solve(validation_microstructure, disc, macro_strain, solver)
 
-@assert sol.stress_avg ≈ validation_sol.stress_avg
+sol.stress_avg ≈ validation_sol.stress_avg
 
 

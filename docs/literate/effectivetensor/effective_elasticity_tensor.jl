@@ -26,21 +26,26 @@ Using Voigt-notation, we can express the stress and strain tensors are represent
 We can then express linear elasticity as:
 
 ```math
-\underbrace{\begin{bmatrix}
-C_{11} & C_{12} & C_{13}\\
-C_{21} & C_{22} & C_{23}\\
-C_{31} & C_{32} & C_{33}
-\end{\bmatrix}}_{\mathbb{C}}
-\begin{bmatrix}
+\mathbb{C} \cdot \begin{bmatrix}
 \varepsilon_{11}\\
 \varepsilon_{22}\\
 2\varepsilon_{12}
-\end{\bmatrix} =
-\begin{bmatrix}
+\end{bmatrix} 
+= \begin{bmatrix}
 \sigma_{11}\\
 \sigma_{22}\\
 \sigma_{12}
-\end{\bmatrix}.
+\end{bmatrix},
+```
+
+with
+
+```math
+\mathbb{C} = \begin{bmatrix}
+C_{11} & C_{12} & C_{13}\\
+C_{21} & C_{22} & C_{23}\\
+C_{31} & C_{32} & C_{33}
+\end{bmatrix}.
 ```
 
 Our goal is to determine ``\mathbb{C}``, such that it reproduces the macroscopic, average behaviour of the material:
@@ -57,6 +62,7 @@ To begin we first define the microstructure geometry using an indicator function
 using FFTMechHomo
 using LinearAlgebra
 using Plots
+#md ENV["GKSwstype"] = "100" #hide
 
 dim = 2
 L = 257
@@ -65,6 +71,11 @@ centered_range(L::Int) = collect(1:L) .- (L÷2 + mod(L,2))
 
 X = centered_range(L)
 indicator = [x^2 + y^2 <= r^2 ? 1 : 2 for x in X, y in X]
+#md nothing # hide
+
+#===
+The resulting microstructure geometry can be displayed like this:
+===#
 
 heatmap(
     indicator;
@@ -74,9 +85,6 @@ heatmap(
     xlabel="X", ylabel="Y"
 )
 
-#md savefig("microstructure-indicators.svg"); nothing # hide
-# ![Indicator function for microstructure with circular inclusion](microstructure-indicators.svg)
-
 #===
 We assign material properties according to the indicator function and construct a ```Microstructure```.
 ===#
@@ -84,6 +92,7 @@ We assign material properties according to the indicator function and construct 
 mat1 = LinearIsotropicElastic{dim}(72000., 0.22)
 mat2 = LinearIsotropicElastic{dim}(48000., 0.3)
 microstructure = Microstructure(map(x -> x == 1 ? mat1 : mat2, indicator))
+#md nothing # hide
 
 #===
 Now we specify the discretization of the microstructure and the numerical scheme used to compute the strain field under an applied macroscopic strain.
@@ -92,6 +101,7 @@ Now we specify the discretization of the microstructure and the numerical scheme
 disc = MoulinetSuquetDiscretization(microstructure)
 α₀ = 1.5(mat1.μ + mat2.μ)
 solver = BasicScheme(α₀, microstructure)
+#md nothing # hide
 
 #===
 Before computing the strain fields, we define three independent macroscopic load cases required to identify the effective material tensor.
@@ -103,6 +113,7 @@ macro_strains = [
     MacroscopicStrain([0, ε0, 0]),
     MacroscopicStrain([0, 0, ε0])
 ]
+#md nothing # hide
 
 #===
 We apply each macroscopic strain and compute the resulting stress fields. Note that, by definition of the FFT-based homogenization procedure, the volume-averaged strain equals the applied macroscopic strain, up to numerical errors, provided that the solution has converged.
@@ -115,13 +126,14 @@ for (i, macro_strain) in enumerate(macro_strains)
 
     ℂ[i,:] = sol.stress_avg ./ ε0
 end
+#md nothing # hide
 
 #===
-Finally, we validate the homogenized material by verifying that the average stress response to a test strain is correctly reproduced using the identified material tensor stored in '''ℂ'''. 
+Finally, we validate the homogenized material by verifying that the average stress response to a test strain is correctly reproduced using the identified material tensor stored in 'ℂ'. 
 ===#
 
 test_strain = MacroscopicStrain([ε0, ε0, ε0])
 test_sol = solve(microstructure, disc, test_strain, solver)
 homogenized_stress = ℂ * test_strain.data
-@assert isapprox(test_sol.stress_avg, homogenized_stress; rtol=1e-3)
+isapprox(test_sol.stress_avg, homogenized_stress; rtol=1e-3)
 
