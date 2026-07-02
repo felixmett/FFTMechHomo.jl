@@ -17,9 +17,7 @@ Solve the periodic homogenization problem for a given macroscopic strain.
 Returns a [`Solution`](@ref) containing the strain and stress fields, the
 macroscopic stress average, convergence history, and iteration count.
 
-# Interface
-Subtypes of [`AbstractSolver`](@ref) must implement this method. The arguments
-are:
+Arguments:
 - `microstructure`: spatial distribution of material models
 - `discretization`: discretization of the Green operator in Fourier space
 - `macro_strain`: applied macroscopic strain
