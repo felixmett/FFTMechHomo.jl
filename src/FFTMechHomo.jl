@@ -7,6 +7,7 @@ using Statistics
 
 # types
 export HistoryIndependent
+export HistoryDependent
 
 # structs
 export MoulinetSuquetDiscretization
