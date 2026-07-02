@@ -4,7 +4,7 @@
         ms = Microstructure(fill(mat, 4, 4, 4))
 
         solver = BasicScheme(2 * mat.μ, ms)
-        @test solver isa BasicScheme{FFTMechHomo.Linear, Float64}
+        @test solver isa BasicScheme{Float64}
         @test solver.α₀ ≈ 2 * mat.μ
         @test solver.tol ≈ 1e-5
         @test solver.maxiter == 100
@@ -19,13 +19,13 @@
 
         # type promotion — Int α₀ promoted to T from microstructure
         solver3 = BasicScheme(2, ms)
-        @test solver3 isa BasicScheme{FFTMechHomo.Linear, Float64}
+        @test solver3 isa BasicScheme{Float64}
         @test solver3.α₀ isa Float64
 
         # Float32 microstructure
         mat32 = LinearIsotropicElastic{3, Float32}(Float32(1), Float32(0.3))
         ms32 = Microstructure(fill(mat32, 4, 4, 4))
         solver32 = BasicScheme(Float32(2 * mat.μ), ms32)
-        @test solver32 isa BasicScheme{FFTMechHomo.Linear, Float32}
+        @test solver32 isa BasicScheme{Float32}
     end
 end

@@ -1,5 +1,5 @@
 """
-    BasicScheme{L, T}(α₀, microstructure; tol, maxiter, FFTW_flags, FFTW_num_threads)
+    BasicScheme(α₀, microstructure; tol, maxiter, FFTW_flags, FFTW_num_threads)
 
 Moulinec-Suquet basic scheme solver for periodic homogenization.
 
@@ -21,7 +21,7 @@ ms = Microstructure(fill(LinearIsotropicElastic{3}(72e3, 0.3), 32, 32, 32))
 solver = BasicScheme(2 * 72e3, ms; tol=1e-6, maxiter=200)
 ```
 """
-struct BasicScheme{L <: AbstractLinearity, T <: AbstractFloat} <: AbstractSolver
+struct BasicScheme{T <: AbstractFloat} <: AbstractSolver
     α₀::T
     tol::T
     maxiter::Int
@@ -33,8 +33,7 @@ function BasicScheme(
     α₀::Real, microstructure::Microstructure{dim, T};
     tol=1e-5, maxiter=100, FFTW_flags=FFTW.MEASURE, FFTW_num_threads=1
 ) where {dim, T <: AbstractFloat}
-    L = Linear # TODO: make that inferrable from a microstructure!
-    return BasicScheme{L, T}(T(α₀), T(tol), maxiter, FFTW_flags, FFTW_num_threads)
+    return BasicScheme{T}(T(α₀), T(tol), maxiter, FFTW_flags, FFTW_num_threads)
 end
 
 """
@@ -49,7 +48,7 @@ function solve(
     microstructure::Microstructure{dim, T},
     disc::AbstractDiscreteGreenOperator{dim, T},
     macro_strain::MacroscopicStrain{dim, T},
-    solver::BasicScheme{Linear, T}
+    solver::BasicScheme{T}
 ) where {dim, T}
     ref = ReferenceMaterial{dim, T}(solver.α₀)
     internal_microstructure = InternalMicrostructure(microstructure)

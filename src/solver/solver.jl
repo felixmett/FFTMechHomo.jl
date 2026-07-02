@@ -25,30 +25,6 @@ Arguments:
 """
 function solve end
 
-"""
-    AbstractLinearity
-
-Abstract supertype for linearity markers used as type parameters in solver structs.
-See [`Linear`](@ref) and [`NonLinear`](@ref).
-"""
-abstract type AbstractLinearity end
-
-"""
-    Linear <: AbstractLinearity
-
-Marks a solver as operating on a microstructure with only [`HistoryIndependent`](@ref)
-materials, enabling a single-loop solution scheme.
-"""
-abstract type Linear <: AbstractLinearity end
-
-"""
-    NonLinear <: AbstractLinearity
-
-Marks a solver as operating on a microstructure containing [`HistoryDependent`](@ref)
-materials, requiring an inner iteration loop.
-"""
-abstract type NonLinear <: AbstractLinearity end
-
 struct GridConstants{dim, T <: AbstractFloat}
     n_voigt::Int
     n_cells::T
