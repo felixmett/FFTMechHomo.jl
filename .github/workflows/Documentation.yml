@@ -21,4 +21,4 @@ jobs:
       - name: Build and deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bash /scripts/builddocs.sh
+        run: bash scripts/builddocs.sh
