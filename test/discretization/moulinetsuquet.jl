@@ -1,7 +1,7 @@
 @testset "MoulinetSuquetDiscretization" begin
     @testset "Constructor" begin
         n = 8
-        @testet "2D" begin
+        @testset "2D" begin
             ms = Microstructure(fill(LinearIsotropicElastic{2}(1.0, 0.3), n, n))
             disc = MoulinetSuquetDiscretization(ms)
 
