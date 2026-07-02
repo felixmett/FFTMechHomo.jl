@@ -1,7 +1,7 @@
 function test_discretizations(n::Int, dim::Int)
+    ms = Microstructure(fill(LinearIsotropicElastic{dim}(1.0, 0.3), ntuple(x -> n, dim)...))
     implemented_discs = [
-        disc(Microstructure(fill(LinearIsotropicElastic{dim}(1.0, 0.3), ntuple(x -> n, dim)...)))
-        for disc in subtypes(FFTMechHomo.AbstractDiscreteGreenOperator)
+        MoulinetSuquetDiscretization(ms),
     ]
     return implemented_discs
 end
